@@ -1,0 +1,25 @@
+# TrustDesk local infrastructure
+# Run: docker compose up -d
+# This starts PostgreSQL 16 with the pgvector extension pre-installed.
+version: "3.9"
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: trustdesk-postgres
+    environment:
+      POSTGRES_DB: trustdesk
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - trustdesk_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d trustdesk"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  trustdesk_pgdata:

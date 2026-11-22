@@ -1,0 +1,94 @@
+spring:
+  application:
+    name: trustdesk-backend
+
+  # Default: PostgreSQL with pgvector (vector DB)
+  datasource:
+    url: jdbc:postgresql://localhost:5432/trustdesk_db
+    username: postgres
+    password: root
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+
+  sql:
+    init:
+      mode: never
+
+server:
+  port: 8080
+
+groq:
+  api-key: ${GROQ_API_KEY:}
+  base-url: https://api.groq.com/openai/v1
+  model: openai/gpt-oss-20b
+
+# Embeddings for pgvector
+embedding:
+  provider: mock      # mock | openai
+  openai:
+    api-key: ${OPENAI_API_KEY:}
+    base-url: https://api.openai.com/v1
+    model: text-embedding-3-small
+  dimensions: 1536
+
+retrieval:
+  mode: vector          # vector | keyword
+  top-k: 5
+  min-score: 0.30
+
+jwt:
+  secret: ${JWT_SECRET:trustdesk-super-secret-key-change-in-production-0123456789}
+  expiration: 28800000
+
+data:
+  loading:
+    enabled: ${DATA_LOADING_ENABLED:true}
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+
+logging:
+  level:
+    com.trustdesk: INFO
+    org.hibernate.SQL: WARN
+
+---
+# Test profile: H2 in-memory + keyword retrieval (no pgvector needed)
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:h2:mem:trustdeskdb;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+
+embedding:
+  provider: mock
+
+retrieval:
+  mode: keyword
+
+data:
+  loading:
+    enabled: true
