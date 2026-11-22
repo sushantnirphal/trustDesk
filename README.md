@@ -250,7 +250,7 @@ Invoke-RestMethod -Method POST http://localhost:8080/guardrails/check -Headers $
 ### Still to build (post-capstone)
 
 - ⬜ Production hardening: refresh tokens + RBAC, rate limiting, audit log export, retries/circuit breaker around Groq, Flyway migrations, structured logging/metrics, CI pipeline
-- ⬜ Automated frontend tests (Vitest + React Testing Library) and ESLint configuration
+
 
 ---
 
